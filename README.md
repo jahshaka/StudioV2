@@ -54,19 +54,13 @@ Jahshaka brings you the future of immersive digital content creation with the le
 ### Requirements
 - Git
 - Cmake *(latest version recommended)*
-- Qt versions *5.7* to *5.9* are recommended *(other versions might work but aren't tested, versions that will break are 5.8 and 5.9.4)*
+- Qt versions *6.8*are recommended *(other versions might work but aren't tested)
 - A C++ compiler with support for C++11 or later (choose a compiler for your OS when installing the Qt SDK. G++, MSVC and clang are all supported). If building on Windows, choose the default mingw compiler `MinGW 5.3.0 32 bit` as well as `msvc2017 64-bit` so you can build with Visual Studio as well which is what we recommend.
 - Qt Creator (also comes with the Qt SDK, latest version recommended) *AND OR* Microsoft Visual Studio 2017 Community Edition
 
 ### Build steps
-Stable (usually months old releases are available by default), for up to date code (might include bugs), checkout the [`dev` branch](https://github.com/jahshaka/VR/tree/dev) instead of `master`
-
 - Clone the repo from the project page or download a zipped copy of the source for a specific version from the Releases tab
-- Fetch the submodules by opening a command window inside the project and using `git submodule update --init --recursive`
-
-If you will be cloning the repo you can do both steps in one command by using `git clone --recurse-submodules -j8 git://github.com/jahshaka/VR.git`. See https://stackoverflow.com/a/4438292/996468
-
-Again, if you want to build the latest code, you might want to do a `git checkout dev` at this point.
+- Follow Qt Creator or MSVC instructions
 
 **If using Qt Creator (on any platform)**
 - Make sure Cmake has been installed and properly added to your path.
@@ -81,6 +75,15 @@ Again, if you want to build the latest code, you might want to do a `git checkou
 - Now press Generate and finally you can use the Open Project button to launch visual studio with the solution opened.
 - Finally, you might want to change the build target from the default `ALL_BUILD` to `Jahshaka` in the Solution Explorer.
 - Build the application.
+
+### Dependencies
+Jahshaka Studio dependencies and directory structure:
+- [Asssimp](https://github.com/assimp/assimp) Studio/irisgl/src/assimp
+- [Bullet3](https://github.com/bulletphysics/bullet3) Studio/irisgl/src/bullet3
+- [Zip](https://github.com/kuba--/zip) Studio/irisgl/src/zip
+- [Material Editor](https://github.com/jahshaka/Effects) Studio/src/shadergraph
+- [Breakpad](https://github.com/jahshaka/breakpad) Studio/thirdparty/breakpad
+
 
 If you encounter any issues building, please open an issue.
 
