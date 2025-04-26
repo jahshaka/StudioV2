@@ -59,7 +59,7 @@ Jahshaka brings you the future of immersive digital content creation with the le
 - Qt Creator (also comes with the Qt SDK, latest version recommended) *AND OR* Microsoft Visual Studio 2017 Community Edition
 
 ### Build steps
-- Clone the repo from the project page or download a zipped copy of the source for a specific version from the Releases tab
+- Clone the repo from the project page or download a zipped copy of the source
 - Follow Qt Creator or MSVC instructions
 
 **If using Qt Creator (on any platform)**
