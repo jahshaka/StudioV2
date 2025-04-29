@@ -1,4 +1,7 @@
 #pragma once
+
+#include <QtGlobal>
+
 #include <irisgl/IrisGL.h>
 
 namespace shadergraph

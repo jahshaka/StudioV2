@@ -12,9 +12,10 @@ For more information see the LICENSE file
 #ifndef EDITORVRCONTROLLER_H
 #define EDITORVRCONTROLLER_H
 
+#include <QMatrix4x4>
+
 #include "../irisgl/src/irisglfwd.h"
 #include "cameracontrollerbase.h"
-#include <QMatrix4x4>
 
 class VrHand
 {

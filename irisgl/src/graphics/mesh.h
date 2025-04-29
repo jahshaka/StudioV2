@@ -15,7 +15,8 @@ For more information see the LICENSE file
 #include <QString>
 #include <qopengl.h>
 #include <QColor>
-#include "../irisglfwd.h"
+
+//#include "../irisglfwd.h"
 #include "../animation/skeletalanimation.h"
 #include "../geometry/boundingsphere.h"
 #include "../geometry/aabb.h"

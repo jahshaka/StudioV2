@@ -13,6 +13,7 @@ For more information see the LICENSE file
 #define VERTEXLAYOUT_H
 
 #include <QList>
+
 #include "../irisglfwd.h"
 #include "mesh.h"
 

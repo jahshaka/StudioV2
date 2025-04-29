@@ -12,7 +12,6 @@ For more information see the LICENSE file
 #ifndef BILLBOARD_H
 #define BILLBOARD_H
 
-#include <qopengl.h>
 #include "../../irisglfwd.h"
 
 class QOpenGLFunctions_3_2_Core;

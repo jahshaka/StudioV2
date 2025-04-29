@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtGlobal>
 #include <irisgl/IrisGL.h>
 #include "materialsettingswidget.h"
 

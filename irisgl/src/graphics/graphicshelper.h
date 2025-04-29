@@ -14,6 +14,7 @@ For more information see the LICENSE file
 
 #include <QString>
 #include <QList>
+
 #include "../irisglfwd.h"
 #include "../graphics/mesh.h"
 

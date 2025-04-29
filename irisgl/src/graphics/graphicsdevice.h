@@ -2,10 +2,12 @@
 #define GRAPHICSDEVICE_H
 
 #include "../irisglfwd.h"
+
 #include <QOpenGLFunctions_3_2_Core>
 #include <QOpenGLShaderProgram>
 #include <QRect>
 #include <QStack>
+
 #include "vertexlayout.h"
 #include "blendstate.h"
 #include "depthstate.h"

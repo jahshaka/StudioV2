@@ -10,8 +10,10 @@ For more information see the LICENSE file
 *************************************************************************/
 
 #include "texture2d.h"
+
 #include <QDebug>
 #include <QOpenGLFunctions_3_2_Core>
+
 #include "../core/logger.h"
 
 namespace iris

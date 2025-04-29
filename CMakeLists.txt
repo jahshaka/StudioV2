@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
+
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 foreach(p CMP0071) # 3.10: Let AUTOMOC and AUTOUIC process GENERATED files
     if(POLICY ${p})
@@ -21,6 +22,7 @@ include(AddExternalSubdirectories)
 include(BuildType)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
+
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)

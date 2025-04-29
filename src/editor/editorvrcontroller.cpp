@@ -10,6 +10,9 @@ For more information see the LICENSE file
 *************************************************************************/
 
 #include "editorvrcontroller.h"
+
+#include <QtMath>
+
 #include "../irisgl/src/graphics/graphicsdevice.h"
 #include "../irisgl/src/graphics/renderitem.h"
 #include "../irisgl/src/graphics/material.h"
@@ -32,7 +35,6 @@ For more information see the LICENSE file
 #include "../commands/transfrormscenenodecommand.h"
 #include "../uimanager.h"
 #include "irisgl/extras/Materials.h"
-#include <QtMath>
 
 
 class FresnelMaterial : public iris::Material

@@ -12,9 +12,11 @@ For more information see the LICENSE file
 #ifndef PLAYERMOUSECONTROLLER_H
 #define PLAYERMOUSECONTROLLER_H
 
-#include "irisglfwd.h"
+#include <QtGlobal>
 #include <QQuaternion>
 #include <QVector3D>
+
+#include "irisglfwd.h"
 #include "../editor/cameracontrollerbase.h"
 #include "../widgets/sceneviewwidget.h"
 

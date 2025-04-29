@@ -10,6 +10,15 @@ For more information see the LICENSE file
 *************************************************************************/
 
 #include "forwardrenderer.h"
+
+#include <QOpenGLContext>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_2_Core>
+#include <QSharedPointer>
+#include <QOpenGLTexture>
+#include <QMatrix4x4>
+
 #include "../scenegraph/scene.h"
 #include "../scenegraph/scenenode.h"
 #include "../scenegraph/cameranode.h"
@@ -25,13 +34,6 @@ For more information see the LICENSE file
 #include "material.h"
 #include "renderitem.h"
 #include "shadowmap.h"
-#include <QOpenGLContext>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLFunctions>
-#include <QOpenGLFunctions_3_2_Core>
-#include <QSharedPointer>
-#include <QOpenGLTexture>
-#include <QMatrix4x4>
 #include "viewport.h"
 #include "utils/billboard.h"
 #include "utils/fullscreenquad.h"

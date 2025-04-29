@@ -8,6 +8,7 @@ and/or modify it under the terms of the GPLv3 License
 
 For more information see the LICENSE file
 *************************************************************************/
+#include "meshnode.h"
 
 #include <QFileInfo>
 #include <QJsonDocument>
@@ -16,7 +17,6 @@ For more information see the LICENSE file
 #include <QDir>
 
 #include "../irisglfwd.h"
-#include "meshnode.h"
 #include "../graphics/mesh.h"
 #include "assimp/postprocess.h"
 #include "assimp/Importer.hpp"

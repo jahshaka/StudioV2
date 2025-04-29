@@ -9,15 +9,12 @@ and/or modify it under the terms of the GPLv3 License
 For more information see the LICENSE file
 *************************************************************************/
 
-#include "../graphics/material.h"
-#include "../graphics/texture.h"
-#include "../graphics/texture2d.h"
-#include "../graphics/graphicsdevice.h"
-#include "../materials/defaultmaterial.h"
-#include "../scenegraph/scene.h"
-#include "../core/irisutils.h"
+
+#include "defaultmaterial.h"
+
 #include <QFile>
 #include <QTextStream>
+#include <QtMinMax>
 
 #include <QOpenGLShader>
 #include <QOpenGLShaderProgram>
@@ -25,6 +22,16 @@ For more information see the LICENSE file
 #include <QColor>
 
 #include <QOpenGLFunctions_3_2_Core>
+
+#include "../graphics/material.h"
+#include "../graphics/texture.h"
+#include "../graphics/texture2d.h"
+#include "../graphics/graphicsdevice.h"
+#include "../materials/defaultmaterial.h"
+#include "../scenegraph/scene.h"
+#include "../core/irisutils.h"
+
+
 
 namespace iris
 {

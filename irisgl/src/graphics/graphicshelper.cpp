@@ -9,8 +9,9 @@ and/or modify it under the terms of the GPLv3 License
 For more information see the LICENSE file
 *************************************************************************/
 
-#include <QRegularExpression>
 #include "graphicshelper.h"
+
+#include <QRegularExpression>
 #include <QOpenGLShaderProgram>
 
 #include "assimp/postprocess.h"

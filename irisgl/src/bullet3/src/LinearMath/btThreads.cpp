@@ -13,8 +13,10 @@ subject to the following restrictions:
 */
 
 #include "btThreads.h"
-#include "btQuickprof.h"
+
 #include <algorithm>  // for min and max
+
+#include "btQuickprof.h"
 
 #if BT_USE_OPENMP && BT_THREADSAFE
 

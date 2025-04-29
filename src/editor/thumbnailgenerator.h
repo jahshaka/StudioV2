@@ -12,11 +12,7 @@ For more information see the LICENSE file
 #ifndef THUMBNAILGENERATOR_H
 #define THUMBNAILGENERATOR_H
 
-#include "irisgl/src/irisglfwd.h"
-#include "irisgl/src/scenegraph/meshnode.h"
-#include "irisgl/src/materials/custommaterial.h"
-#include "irisgl/src/materials/defaultmaterial.h"
-
+#include <QtMath>
 #include <QThread>
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
@@ -25,6 +21,12 @@ For more information see the LICENSE file
 #include <QSemaphore>
 #include <QImage>
 #include <QJsonObject>
+
+#include "irisgl/src/irisglfwd.h"
+#include "irisgl/src/scenegraph/meshnode.h"
+#include "irisgl/src/materials/custommaterial.h"
+#include "irisgl/src/materials/defaultmaterial.h"
+
 
 #include "core/database/database.h"
 

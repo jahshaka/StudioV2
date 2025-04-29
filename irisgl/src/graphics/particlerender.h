@@ -16,6 +16,7 @@ For more information see the LICENSE file
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFunctions_3_2_Core>
 #include <QOpenGLContext>
+
 #include "particle.h"
 #include "renderdata.h"
 #include "texture2d.h"

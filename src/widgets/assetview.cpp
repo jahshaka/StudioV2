@@ -828,7 +828,7 @@ AssetView::AssetView(Database *handle, QWidget *parent) : db(handle), QWidget(pa
 			std::vector<QString> commaSeparated(1);
 			int commaCounter = 0;
 			for (int i = 0; i<stringIn.size(); i++) {
-				if (stringIn[i] == ",") {
+                if (stringIn[i] == ',') {
 					commaSeparated.push_back("");
 					commaCounter++;
 				}

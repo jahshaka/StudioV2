@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
+
+
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 foreach(p CMP0071) # 3.10: Let AUTOMOC and AUTOUIC process GENERATED files
     if(POLICY ${p})
@@ -28,8 +30,9 @@ function(add_subdirectory_with_folder _folder_name _folder)
     endforeach()
 endfunction()
 
-find_package(OpenGL REQUIRED) # is this needed?
-find_package(Qt6 REQUIRED COMPONENTS Core OpenGL OpenGLWidgets Multimedia Network)
+#find_package(Qt6 COMPONENTS Core)
+
+find_package(Qt6 COMPONENTS Core Gui OpenGL OpenGLWidgets Multimedia Network)
 message(STATUS "Qt6_VERSION: ${Qt6_VERSION}")
 message(STATUS "Qt6_INSTALL_PREFIX: ${Qt6_INSTALL_PREFIX}")
 
@@ -265,10 +268,9 @@ target_include_directories(IrisGL PUBLIC
     "${PROJECT_BINARY_DIR}/src/assimp/include/"
     "${PROJECT_SOURCE_DIR}/src/assimp/include/"
     "${PROJECT_SOURCE_DIR}/src/libovr/Include"
-    "${PROJECT_SOURCE_DIR}/src/bullet3"
     "${PROJECT_SOURCE_DIR}/src/bullet3/src"
     "${PROJECT_SOURCE_DIR}/src/zip/src"
 )
 
-target_link_libraries (IrisGL assimp zip BulletDynamics BulletCollision LinearMath Bullet3Common Qt6::Core Qt6::OpenGL Qt6::OpenGLWidgets Qt6::Multimedia Qt6::Network)
+target_link_libraries (IrisGL assimp zip BulletDynamics BulletCollision LinearMath Bullet3Common Qt6::Core Qt6::Gui Qt6::OpenGL Qt6::OpenGLWidgets Qt6::Multimedia Qt6::Network)
 target_compile_options(IrisGL PUBLIC)

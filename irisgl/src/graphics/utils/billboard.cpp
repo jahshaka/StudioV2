@@ -9,11 +9,14 @@ and/or modify it under the terms of the GPLv3 License
 For more information see the LICENSE file
 *************************************************************************/
 
-#include <QOpenGLFunctions_3_2_Core>
 #include "billboard.h"
+
+#include <QOpenGLFunctions_3_2_Core>
+#include <cstddef>
 #include <qopengl.h>
 #include <QOpenGLShader>
 #include <QOpenGLBuffer>
+
 #include "../../core/irisutils.h"
 #include "../graphicshelper.h"
 #include "../mesh.h"
