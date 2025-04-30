@@ -64,7 +64,7 @@ AssetViewer::AssetViewer(QWidget *parent) : QOpenGLWidget(parent)
 
 void AssetViewer::paintGL()
 {
-    makeCurrent();
+//    makeCurrent();
 
     float dt = elapsedTimer.nsecsElapsed() / (1000.0f * 1000.0f * 1000.0f);
     elapsedTimer.restart();
@@ -75,7 +75,7 @@ void AssetViewer::paintGL()
         renderer->renderScene(dt, viewport);
     }
 
-    doneCurrent();
+//    doneCurrent();
 }
 
 void AssetViewer::updateScene()
@@ -85,11 +85,17 @@ void AssetViewer::updateScene()
 
 void AssetViewer::initializeGL()
 {
-    // QOpenGLWidget::initializeGL();
+    // static bool initialized = false;
+    // if (initialized) return;
+    // initialized = true;
 
-    // initializeOpenGLFunctions();
-    gl = new QOpenGLFunctions_3_2_Core();
-    gl->initializeOpenGLFunctions();
+    QOpenGLWidget::initializeGL();  // ✅ 先初始化基类上下文
+    makeCurrent();                  // ✅ 确保上下文 active（某些版本不自动）
+
+    if (!gl) {
+        gl = new QOpenGLFunctions_3_2_Core();
+        gl->initializeOpenGLFunctions();  // ✅ 正确初始化函数指针
+    }
 
     gl->glEnable(GL_DEPTH_TEST);
     gl->glEnable(GL_CULL_FACE);
