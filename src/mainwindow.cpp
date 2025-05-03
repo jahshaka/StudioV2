@@ -2377,7 +2377,9 @@ void MainWindow::setupViewPort()
 
 	help = new QPushButton;
 	help->setObjectName("helpButton");
-	help->setText(QChar(fa::questioncircle));
+    // for adapting Qt6.9.0
+    help->setText(QChar(static_cast<ushort>(fa::questioncircle)));
+    //help->setText(QChar(fa::questioncircle));
 	help->setFont(fontIcons->font(28));
 	help->setCursor(Qt::PointingHandCursor);
 
@@ -2398,7 +2400,9 @@ void MainWindow::setupViewPort()
 	prefs = new QPushButton;
 	prefs->setObjectName("prefsButton");
 
-	prefs->setText(QChar(fa::cog));
+    //prefs->setText(QChar(fa::cog));
+    // for adapting Qt6.9.0
+    help->setText(QChar(static_cast<ushort>(fa::cog)));
 	prefs->setFont(fontIcons->font(28));
 	prefs->setCursor(Qt::PointingHandCursor);
 
