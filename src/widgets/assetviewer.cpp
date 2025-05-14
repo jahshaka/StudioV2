@@ -85,17 +85,11 @@ void AssetViewer::updateScene()
 
 void AssetViewer::initializeGL()
 {
-    // static bool initialized = false;
-    // if (initialized) return;
-    // initialized = true;
+    QOpenGLWidget::initializeGL();
+    makeCurrent();
 
-    QOpenGLWidget::initializeGL();  // ✅ 先初始化基类上下文
-    makeCurrent();                  // ✅ 确保上下文 active（某些版本不自动）
-
-    if (!gl) {
-        gl = new QOpenGLFunctions_3_2_Core();
-        gl->initializeOpenGLFunctions();  // ✅ 正确初始化函数指针
-    }
+    gl = new QOpenGLFunctions_3_2_Core();
+    gl->initializeOpenGLFunctions();
 
     gl->glEnable(GL_DEPTH_TEST);
     gl->glEnable(GL_CULL_FACE);
@@ -188,7 +182,7 @@ void AssetViewer::wheelEvent(QWheelEvent *event)
 }
 
 void AssetViewer::renderObject() {
-	render = true;
+    render = true;
 }
 
 void AssetViewer::mouseMoveEvent(QMouseEvent *e)

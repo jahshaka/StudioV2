@@ -87,13 +87,13 @@ void RenderList::clear()
 
 void RenderList::sort()
 {
-    /*
-    qSort(renderList.begin(), renderList.end(), [](const RenderItem* a, const RenderItem* b) {
+
+    std::sort(renderList.begin(), renderList.end(), [](const RenderItem* a, const RenderItem* b) {
         return a->renderLayer < b->renderLayer;
     });
-    */
 
-    std::sort(renderList.begin(), renderList.end(), [](const RenderItem* a, const RenderItem* b) { return true; });
+
+//    std::sort(renderList.begin(), renderList.end(), [](const RenderItem* a, const RenderItem* b) { return true; });
 }
 
 RenderList::~RenderList()
