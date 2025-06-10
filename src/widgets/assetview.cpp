@@ -87,9 +87,9 @@ bool AssetView::eventFilter(QObject *watched, QEvent *event)
 				if (QFileInfo(list.front()).suffix() == "jaf") {
 					importJahModel(list.front());
 				}
-				//else {
-				//	importModel(list.front());
-				//}
+                else {
+                    importModel(list.front());
+                }
 
 				break;
 			}
@@ -769,6 +769,28 @@ AssetView::AssetView(Database *handle, QWidget *parent) : db(handle), QWidget(pa
                 }
             }
 
+            if (gridItem->metadata["type"].toInt() == static_cast<int>(ModelTypes::File)) {
+                viewers->setCurrentIndex(0);
+                if (viewer->cachedAssets.value(gridItem->metadata["guid"].toString())) {
+                    viewer->addNodeToScene(viewer->cachedAssets.value(gridItem->metadata["guid"].toString()), gridItem->metadata["guid"].toString(), true, false);
+                    viewer->orientCamera(pos, rot, distObj);
+                }
+                else {
+                    QString path;
+                    // if model
+                    QDir dir(assetPath);
+                    foreach(auto &file, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files)) {
+                        if (Constants::MODEL_EXTS.contains(file.suffix())) {
+                            path = file.absoluteFilePath();
+                            break;
+                        }
+                    }
+
+                    viewer->loadObjModel(path, gridItem->metadata["guid"].toString(), false, true, !cached);
+                    viewer->orientCamera(pos, rot, distObj);
+                }
+            }
+
             if (gridItem->metadata["type"].toInt() == static_cast<int>(ModelTypes::Material)) {
                 viewers->setCurrentIndex(0);
                 if (viewer->cachedAssets.value(gridItem->metadata["guid"].toString())) {
@@ -871,17 +893,17 @@ AssetView::AssetView(Database *handle, QWidget *parent) : db(handle), QWidget(pa
 	});
 
 	connect(browseButton, &QPushButton::pressed, [=]() {
-		filename = QFileDialog::getOpenFileName(this,
-												"Load Mesh",
-												QString(),
-												"Mesh Files (*.obj *.fbx *.3ds *.jaf)");
+        filename = QFileDialog::getOpenFileName(this,
+                                                "Load Mesh",
+                                                QString(),
+                                                "Mesh Files (*.obj *.fbx *.3ds *.jaf)");
 
-		if (QFileInfo(filename).suffix() == "jaf") {
-			importJahModel(filename);
-		}
-		//else {
-		//	importModel(filename);
-		//}
+        if (QFileInfo(filename).suffix() == "jaf") {
+            importJahModel(filename);
+        }
+        else {
+            importModel(filename);
+        }
 	});
 
 	assetDropPad->setLayout(assetDropPadLayout);
@@ -1267,13 +1289,75 @@ void AssetView::importJahBundle(const QString &fileName)
     }
 }
 
-void AssetView::importModel(const QString &filename, bool jfx)
+void AssetView::importModel(const QString &fileName, bool jfx)
 {
-	if (!filename.isEmpty()) {
-		renameModelField->setText(QFileInfo(filename).baseName());
-		viewer->loadModel(filename);
-		addToLibrary(jfx);
-	}
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QFileInfo entryInfo(fileName);
+
+    auto assetPath = IrisUtils::join(
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),
+        "AssetStore"
+        );
+
+    QString guid = GUIDManager::generateGUID();
+
+    QString assetsDir = entryInfo.path();
+    // QDirIterator projectDirIterator(assetsDir, QDir::NoDotAndDotDot | QDir::Files | QDir::Hidden);
+
+    // QStringList fileNames;
+    // while (projectDirIterator.hasNext()) fileNames << projectDirIterator.next();
+
+    const QString assetFolder = QDir(assetPath).filePath(guid);
+    QDir().mkpath(assetFolder);
+
+    copyDirectoryRecursively(assetsDir, assetFolder);
+
+    // for (const auto &file : fileNames) {
+    //     QFileInfo fileInfo(file);
+    //     QString fileToCopyTo = IrisUtils::join(assetFolder, fileInfo.fileName());
+    //     bool copyFile = QFile::copy(fileInfo.absoluteFilePath(), fileToCopyTo);
+    // }
+
+    QString new_file =  QDir(assetFolder).filePath(QFileInfo(filename).fileName());
+
+    renameModelField->setText(QFileInfo(filename).baseName());
+    viewer->loadModel(new_file);
+    addToLibrary(new_file, guid, jfx);
+}
+
+bool AssetView::copyDirectoryRecursively(const QString &sourcePath, const QString &destinationPath)
+{
+    QDir sourceDir(sourcePath);
+    if (!sourceDir.exists())
+        return false;
+
+    QDir destDir(destinationPath);
+    if (!destDir.exists()) {
+        if (!destDir.mkpath(".")) {
+            qWarning() << "Failed to create destination directory:" << destinationPath;
+            return false;
+        }
+    }
+
+    QFileInfoList entries = sourceDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries);
+    for (const QFileInfo &entry : entries) {
+        QString srcPath = entry.absoluteFilePath();
+        QString destPath = destinationPath + "/" + entry.fileName();
+
+        if (entry.isDir()) {
+            if (!copyDirectoryRecursively(srcPath, destPath))
+                return false;
+        } else {
+            if (!QFile::copy(srcPath, destPath)) {
+                qWarning() << "Failed to copy file:" << srcPath << "to" << destPath;
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 void AssetView::addToJahLibrary(const QString fileName, const QString guid, bool jfx)
@@ -1344,7 +1428,7 @@ void AssetView::addToJahLibrary(const QString fileName, const QString guid, bool
     updateAsset->setVisible(true);
 }
 
-void AssetView::addToLibrary(bool jfx)
+void AssetView::addToLibrary(const QString fileName, const QString guid_helder, bool jfx)
 {
 	//bool canAdd = db->isAuthorInfoPresent();
 	QJsonObject tags;
@@ -1386,9 +1470,9 @@ void AssetView::addToLibrary(bool jfx)
 		QString guid;
 		if (jfx) {
 			guid = db->createAssetEntry(
-                       GUIDManager::generateGUID(),
+                       guid_helder,
                        QFileInfo(filename).fileName(),
-				       static_cast<int>(ModelTypes::Object),
+                       static_cast<int>(ModelTypes::File),
                        QString(),
                        QString(),
                        "JahFX",
@@ -1401,9 +1485,9 @@ void AssetView::addToLibrary(bool jfx)
 		}
 		else {
             guid = db->createAssetEntry(
-                GUIDManager::generateGUID(),
+                guid_helder,
                 QFileInfo(filename).fileName(),
-                static_cast<int>(ModelTypes::Object),
+                static_cast<int>(ModelTypes::File),
                 QString(),
                 QString(),
                 QString(),
@@ -1428,17 +1512,17 @@ void AssetView::addToLibrary(bool jfx)
 
 		Globals::assetNames.insert(guid, object["name"].toString());
 
-        auto assetPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + Constants::ASSET_FOLDER;
+//        auto assetPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + Constants::ASSET_FOLDER;
 
-		if (!QDir(QDir(assetPath).filePath(guid)).exists()) {
-			QDir().mkdir(QDir(assetPath).filePath(guid));
-			bool copyFile = QFile::copy(filename,
-				QDir(QDir(assetPath).filePath(guid)).filePath(
-					IrisUtils::buildFileName(guid, fInfo.suffix().toLower()))
-			);
-		}
+        // if (!QDir(QDir(assetPath).filePath(guid)).exists()) {
+        //     QDir().mkdir(QDir(assetPath).filePath(guid));
+        //     bool copyFile = QFile::copy(filename,
+        //         QDir(QDir(assetPath).filePath(guid)).filePath(
+        //             IrisUtils::buildFileName(guid, fInfo.suffix().toLower()))
+        //     );
+        // }
 
-		copyTextures(guid);
+//        copyTextures(guid);
 
 		//auto material_guid = db->insertMaterialGlobal(QFileInfo(filename).baseName() + "_material", guid, QJsonDocument(viewer->getMaterial()).toBinaryData());
 		//db->insertGlobalDependency(static_cast<int>(ModelTypes::Material), guid, material_guid);

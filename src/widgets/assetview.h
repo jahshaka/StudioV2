@@ -94,7 +94,7 @@ public:
     void checkForEmptyState();
     void toggleFilterPane(bool);
 	void addToJahLibrary(const QString fileName, const QString guid, bool jfx = false);
-	void addToLibrary(bool jfx = false);
+    void addToLibrary(const QString fileName, const QString guid, bool jfx = false);
 	void spaceSplits();
     void closeViewer();
 	void clearViewer();
@@ -108,6 +108,8 @@ signals:
     void refreshCollections();
 
 private:
+    bool copyDirectoryRecursively(const QString &sourcePath, const QString &destinationPath);
+
 	Database *db;
 	QSplitter *_splitter;
 	QWidget *_filterBar;
