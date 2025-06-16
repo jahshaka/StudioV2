@@ -69,6 +69,13 @@ class Database;
 class SettingsManager;
 class PreferencesDialog;
 
+typedef struct directory_tuple
+{
+    QString path;
+    QString guid;
+    QString parent_guid;
+};
+
 class AssetView : public QWidget
 {
 	Q_OBJECT
@@ -94,7 +101,7 @@ public:
     void checkForEmptyState();
     void toggleFilterPane(bool);
 	void addToJahLibrary(const QString fileName, const QString guid, bool jfx = false);
-    void addToLibrary(const QString fileName, const QString guid, bool jfx = false);
+    void addToLibrary(const QString& main_guid, bool jfx = false);
 	void spaceSplits();
     void closeViewer();
 	void clearViewer();
@@ -108,7 +115,12 @@ signals:
     void refreshCollections();
 
 private:
-    bool copyDirectoryRecursively(const QString &sourcePath, const QString &destinationPath);
+    bool copyDirectoryRecursively(const QString &sourcePath,
+                                  const QString &destinationPath);
+    void extractTexturesAndMaterialFromMaterial(
+        const QString &filePath,
+        QStringList &textureList,
+        QJsonObject &mat);
 
 	Database *db;
 	QSplitter *_splitter;

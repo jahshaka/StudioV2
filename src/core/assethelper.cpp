@@ -163,7 +163,7 @@ ModelTypes AssetHelper::getAssetTypeFromExtension(const QString &fileSuffix)
     else if (fileSuffix == Constants::SHADER_EXT) {
         return ModelTypes::Shader;
     }
-    else if (fileSuffix == Constants::MATERIAL_EXT) {
+    else if (Constants::MATERIAL_EXTS.contains(fileSuffix)) {
         return ModelTypes::Material;
     }
     else if (Constants::WHITELIST.contains(fileSuffix)) {

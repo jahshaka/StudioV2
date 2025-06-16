@@ -43,9 +43,9 @@ namespace Contants
     QList<QString> AUDIO_EXTS   = { "mp3", "wav" };
     QList<QString> IMAGE_EXTS   = { "png", "jpg" };
     QList<QString> MODEL_EXTS   = { "obj", "fbx", "dae", "blend"};
-    QList<QString> WHITELIST    = { "txt", "frag", "vert", "vs", "fs" };
+    QList<QString> WHITELIST    = { "txt", "frag", "vert", "vs", "fs"};
 	QString SHADER_EXT		    = "shader";
-	QString MATERIAL_EXT		= "material";
+    QList<QString> MATERIAL_EXTS= { "material"}; //{ "material", "mtl"};
 	QString ASSET_EXT			= "jaf";
     
 
