@@ -123,8 +123,6 @@ QImage MaterialHelper::loadGLBEmbeddedTexture(const aiScene *scene,
         }
         fileName = name + "." + QString(embeddedTex->achFormatHint);
 
-        qDebug() << fileName;
-
         image = covertAiTextureToImage(embeddedTex);
     }
 
