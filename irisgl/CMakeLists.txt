@@ -43,10 +43,10 @@ set(CMAKE_AUTORCC ON)
 
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER AutoMocFolder)
 
-option(ASSIMP_BUILD_ASSIMP_TOOLS                "" OFF)
+option(ASSIMP_BUILD_ASSIMP_TOOLS                "" ON)
 option(ASSIMP_BUILD_TESTS                       "" OFF)
 option(ASSIMP_NO_EXPORT                         "" ON)
-option(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT    "" OFF)
+option(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT    "" ON)
 option(ASSIMP_BUILD_OBJ_IMPORTER                "" ON)
 option(ASSIMP_BUILD_FBX_IMPORTER                "" ON)
 option(ASSIMP_BUILD_COLLADA_IMPORTER            "" ON)

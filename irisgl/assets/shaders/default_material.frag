@@ -67,8 +67,8 @@ struct Light {
     float cutOffAngle;
     float cutOffSoftness;
 
-	vec4 shadowColor;
-	float shadowAlpha;
+        vec4 shadowColor;
+        float shadowAlpha;
 
     sampler2D shadowMap;
     bool shadowEnabled;
@@ -174,7 +174,7 @@ float calculateShadowFactor(in Light light, in vec3 worldPos)
         return calcHardShadowMap(light, lightSpacePos);
     if (light.shadowType==SHADOW_SOFT)
         return calcSoftShadowMap(light, lightSpacePos);
-	if (light.shadowType==SHADOW_VERYSOFT)
+        if (light.shadowType==SHADOW_VERYSOFT)
         return calcVerySoftShadowMap(light, lightSpacePos);
     return 1.0f;
 }
@@ -187,7 +187,7 @@ uniform Light u_lights[MAX_LIGHTS];
 uniform int u_lightCount;
 
 uniform vec3 u_eyePos;
-uniform vec3 u_sceneAmbient; 
+uniform vec3 u_sceneAmbient;
 
 struct Material
 {
@@ -228,17 +228,17 @@ void main()
 {
     vec3 diffuse = vec3(0);
     vec3 specular = vec3(0);
+    vec3 reflCol = vec3(0.0);
 
     vec3 normal = v_normal;
 
     //normal mapping
     if(u_useNormalTex)
     {
-        vec3 texNorm = (texture(u_normalTexture,v_texCoord).xyz-0.5)*2;
-		texNorm.xy *= u_normalIntensity;
-        normal = normalize(v_tanToWorld*texNorm);
-		//normal = normalize(normal);
-        //normal = mix(normal,vec3(0,0,0),u_normalIntensity);
+        vec3 texNorm = texture(u_normalTexture,v_texCoord).xyz * 2.0 - 1.0;
+        texNorm.xy *= u_normalIntensity;
+        vec3 blendNorm = normalize(mix(vec3(0, 0, 1), texNorm, u_normalIntensity));
+        normal = normalize(v_tanToWorld * blendNorm);
     }
 
     vec3 v = normalize(u_eyePos-v_worldPos);
@@ -294,32 +294,46 @@ void main()
 
         if (ndl > 0.0 && u_material.shininess > 0.0) {
             float normFactor = (u_material.shininess + 2.0) / 2.0;//todo: find a better alternative
-            vec3 r = reflect(-l, n);
-            spec = normFactor*pow(max(dot(r, v), 0.0), u_material.shininess)*spotCutoff;
-            //spec = pow(max(dot(r, v), 0.0), 0.7f);
+            // vec3 r = reflect(-l, n);
+            // spec = normFactor*pow(max(dot(r, v), 0.0), u_material.shininess)*spotCutoff;
+
+            vec3 h = normalize(l + v);
+            spec = pow(max(dot(n, h), 0.0), u_material.shininess);
+
         }
 
         //vec4 FragPosLightSpace = u_lights[i].shadowMatrix * vec4(v_worldPos, 1.0);
         //float shadowFactor = u_lights[i].shadowEnabled ? CalcShadowMap(u_lights[i].shadowMap,FragPosLightSpace) : 1.0;
         float shadowFactor = calculateShadowFactor(u_lights[i], v_worldPos);
 
-		float shadow = mix(1.0, shadowFactor, u_lights[i].shadowAlpha);
+                //float shadow = mix(1.0, shadowFactor, u_lights[i].shadowAlpha);
+                float shadow = mix(1.0, shadowFactor, clamp(u_lights[i].shadowAlpha, 0.0, 0.8));
+
         diffuse += mix(u_lights[i].shadowColor.rgb, atten*ndl*u_lights[i].intensity*u_lights[i].color.rgb, shadow);
         specular += mix(u_lights[i].shadowColor.rgb, atten*spec* u_lights[i].intensity * u_lights[i].color.rgb, shadow);
 
-		//diffuse += atten*ndl*u_lights[i].intensity*u_lights[i].color.rgb*shadowFactor;
+                //diffuse += atten*ndl*u_lights[i].intensity*u_lights[i].color.rgb*shadowFactor;
         //specular += atten*spec* u_lights[i].intensity * u_lights[i].color.rgb*shadowFactor;
     }
 
     vec3 col = u_material.diffuse;
 
     if (u_useDiffuseTex) {
-        col = col * texture(u_diffuseTexture, v_texCoord).rgb;
-        if (u_useAlpha && texture(u_diffuseTexture, v_texCoord).a < 0.5) discard;
+        // col = col * texture(u_diffuseTexture, v_texCoord).rgb;
+        // if (u_useAlpha && texture(u_diffuseTexture, v_texCoord).a < 0.5) discard;
+
+        col = texture(u_diffuseTexture, v_texCoord).rgb;
+        col = pow(col, vec3(2.2));  // sRGB → Linear
+        col *= u_material.diffuse;
+
+        if (u_useAlpha && texture(u_diffuseTexture, v_texCoord).a < 0.5)
+            discard;
     }
 
-    if(u_useSpecularTex)
+    if(u_useSpecularTex) {
         specular = specular * texture(u_specularTexture,v_texCoord).rgb;
+        specular *= pow(specular, vec3(2.2));  // sRGB → Linear
+    }
 
     /*
     float ShadowFactor = u_shadowEnabled ? CalcShadowMap(FragPosLightSpace) : 1.0;
@@ -327,24 +341,39 @@ void main()
     vec3 finalColor = ((u_material.ambient * u_sceneAmbient) + (ShadowFactor *
                       (diffuse + (u_material.specular * specular)))) * col;
     */
-    vec3 finalColor = ((u_material.ambient * u_sceneAmbient) + (
-                      (diffuse + (u_material.specular * specular)))) * col;
+    // vec3 finalColor = ((u_material.ambient * u_sceneAmbient) + (
+    //                   (diffuse + (u_material.specular * specular)))) * col;
+
+    vec3 baseColor = col;
+
+    vec3 ambient = u_material.ambient * u_sceneAmbient * baseColor;
+    vec3 diff = diffuse * baseColor;
+    vec3 spec = u_material.specular * specular;
+
+    vec3 finalColor = ambient + diff + spec;
 
     if(u_useReflectionTex)
     {
         vec3 incidentRay = normalize(v_worldPos-u_eyePos);
         vec3 reflVec = reflect(incidentRay,normal);
         vec3 reflCol = texture(u_reflectionTexture, envMapEquirect(normalize(reflVec))).rgb;
+        reflCol = pow(reflCol, vec3(2.2));  // sRGB → Linear
+        //finalColor = mix(finalColor,reflCol,u_reflectionInfluence);
 
-        finalColor = mix(finalColor,reflCol,u_reflectionInfluence);
+        float fresnel = pow(1.0 - dot(v, normal), 5.0);
+        finalColor = mix(finalColor, reflCol, u_reflectionInfluence * fresnel);
     }
 
     if(u_fogData.enabled)
     {
         float zDist = length(v_worldPos-u_eyePos);
         float fogFactor = clamp((zDist-u_fogData.start)/(u_fogData.end-u_fogData.start),0,1);
-        finalColor = mix(finalColor,u_fogData.color.rgb,fogFactor);
+        // finalColor = mix(finalColor,u_fogData.color.rgb,fogFactor);
+        float fresnel = pow(1.0 - dot(normalize(v), normalize(normal)), 5.0);
+        finalColor = mix(finalColor, reflCol, u_reflectionInfluence * fresnel);
+
     }
 
+    finalColor = pow(finalColor, vec3(1.0 / 2.4));
     fragColor = vec4(finalColor, 0.65);
 }

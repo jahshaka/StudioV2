@@ -63,6 +63,10 @@ struct MeshMaterialData
     QString normalTexture;
 
 	QString nodeName;
+
+    bool hasEmbeddedDiffTexture = false;
+    bool hasEmbeddedSpecularTexture = false;
+    bool hasEmbeddedNormalTexture = false;
 };
 
 class VertexArrayData
