@@ -2494,7 +2494,12 @@ void AssetWidget::importRegularAssets(const QList<directory_tupleA> &fileNames)
                 if (asset->type == ModelTypes::Mesh) {
                     QStringList texturesToCopy;
                     this->sceneView->makeCurrent();
-                    auto scene = AssetHelper::extractTexturesAndMaterialFromMesh(asset->path, texturesToCopy);
+                    bool hasEmbeddedTexture(false);
+                    QStringList paths;
+                    auto scene = AssetHelper::extractTexturesAndMaterialFromMesh(asset->path,
+                                                                                 texturesToCopy,
+                                                                                 paths,
+                                                                                 hasEmbeddedTexture);
                     this->sceneView->doneCurrent();
 
                     QString preObjectGuid = GUIDManager::generateGUID();

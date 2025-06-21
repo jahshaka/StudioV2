@@ -183,13 +183,14 @@ void MaterialHelper::extractMaterialData(const aiScene *scene, aiMaterial *aiMat
 
         loadEmbeddedTexture(scene, normalsTex, assetPath, mat.normalTexture, mat.hasEmbeddedNormalTexture);
 
-
         // reading normals for some obj's won't always work with aiTextureType_NORMALS, use this as fallback alt.
         if (normalsTex.isEmpty()) {
             normalsTex = getAiMaterialTexture(aiMat, aiTextureType_HEIGHT);
             mat.normalTexture = QFileInfo(normalsTex).isRelative()
                 ? QDir::cleanPath(QDir(assetPath).filePath(normalsTex))
                 : QDir::cleanPath(normalsTex);
+
+            loadEmbeddedTexture(scene, normalsTex, assetPath, mat.hightTexture, mat.hasEmbeddedHightTexture);
         }
     }
 }

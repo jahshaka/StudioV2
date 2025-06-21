@@ -93,6 +93,7 @@ void AssetViewer::initializeGL()
 
     gl->glEnable(GL_DEPTH_TEST);
     gl->glEnable(GL_CULL_FACE);
+    gl->glEnable(GL_FRAMEBUFFER_SRGB);
 
     renderer = iris::ForwardRenderer::create(false);
     scene = iris::Scene::create();
@@ -309,17 +310,11 @@ void AssetViewer::loadJafSky(QString guid, bool firstAdd, bool cache, bool first
 }
 
 void AssetViewer::loadModel(QString str, QString guid, bool firstAdd, bool cache, bool firstLoad) {
-    loadJafModel(str, guid, firstAdd, cache, firstLoad);
-
-
-    return;
-
     pdialog->setLabelText(tr("Loading asset preview..."));
     pdialog->show();
     QApplication::processEvents();
 	makeCurrent();
-    addJafMesh(str, guid, firstAdd, cache);
-//    addMesh(str, firstAdd, cache);
+    addMesh(str, firstAdd, cache);
 	if (firstLoad) {
 		resetViewerCamera();
 	}
@@ -338,7 +333,7 @@ void AssetViewer::loadObjModel(QString str, QString guid, bool firstAdd, bool ca
     QApplication::processEvents();
     makeCurrent();
 
-    addObjMesh(str, guid, firstAdd, cache);
+    //addObjMesh(str, guid, firstAdd, cache);
     if (firstLoad) resetViewerCamera();
     else resetViewerCameraAfter();
 
@@ -600,140 +595,6 @@ void AssetViewer::addJafMesh(const QString &path, const QString &guid, bool firs
     lastNode = node->getName();
 }
 
-void AssetViewer::addObjMesh(const QString &path, const QString &guid, bool firstAdd, bool cache, QVector3D position)
-{
-    scene->setSkyColor(QColor(25, 25, 25));
-
-    QJsonDocument document = QJsonDocument::fromJson(db->fetchAssetData(guid));
-    QJsonObject objectHierarchy = document.object();
-    assetMaterial = objectHierarchy;
-
-    // // rename animation sources to relative paths
-    QString filename = QDir(Globals::project->folderPath).relativeFilePath(path);
-
-    QJsonArray materialList;
-
-    int iter = 0;
-    std::function<void(QJsonObject, QJsonArray&)> extractMeshMaterial = [&](QJsonObject node, QJsonArray &materialList) -> void {
-        if (!node["material"].toObject().isEmpty()) materialList.append(node["material"].toObject());
-
-        QJsonArray children = node["children"].toArray();
-        if (!children.isEmpty()) {
-            for (auto child : children) {
-                extractMeshMaterial(child.toObject(), materialList);
-                iter++;
-            }
-        }
-    };
-
-    extractMeshMaterial(assetMaterial, materialList);
-
-    ssource = new iris::SceneSource();
-
-    int iteration = 0;
-    auto node = iris::MeshNode::loadAsSceneFragment(filename, [&, this](iris::MeshPtr mesh, iris::MeshMaterialData& data) {
-        //auto mat = iris::CustomMaterial::create();
-        //mat->generate(IrisUtils::getAbsoluteAssetPath("app/shader_defs/Default.shader"));
-        MaterialReader reader;
-        auto mat = reader.createMaterialFromShaderFile(IrisUtils::getAbsoluteAssetPath("app/shader_defs/Default.shader"), db);
-
-        if (firstAdd) {
-            mat->setValue("diffuseColor",	data.diffuseColor);
-            mat->setValue("specularColor",	data.specularColor);
-            mat->setValue("ambientColor",	QColor(130, 130, 130));
-            mat->setValue("emissionColor",	data.emissionColor);
-            mat->setValue("shininess",		data.shininess);
-            mat->setValue("useAlpha",		true);
-
-            mat->setValue("diffuseTexture",	data.diffuseTexture);
-            mat->setValue("specularTexture",	data.specularTexture);
-            mat->setValue("normalTexture",	data.normalTexture);
-
-            if (QFile(data.diffuseTexture).exists() && QFileInfo(data.diffuseTexture).isFile())
-                mat->setValue("diffuseTexture", data.diffuseTexture);
-
-            if (QFile(data.specularTexture).exists() && QFileInfo(data.specularTexture).isFile())
-                mat->setValue("specularTexture", data.specularTexture);
-
-            if (QFile(data.normalTexture).exists() && QFileInfo(data.normalTexture).isFile()) {
-                mat->setValue("normalTexture", data.normalTexture);
-                mat->setValue("normalIntensity", 1.f);
-            }
-
-            // QJsonObject matObj;
-            // createMaterial(matObj, mat);
-            // assetMaterial.insert(QString::number(iteration), matObj);
-        }
-        else {
-            iris::MeshMaterialData cdata;
-            auto matinfox = materialList[iteration].toObject();
-            QJsonObject matinfo = matinfox["values"].toObject();
-
-            QColor col;
-            col.setNamedColor(matinfo["ambientColor"].toString());
-            cdata.ambientColor = col;
-            col.setNamedColor(matinfo["diffuseColor"].toString());
-            cdata.diffuseColor = col;
-            cdata.diffuseTexture = matinfo["diffuseTexture"].toString();
-            cdata.normalTexture = matinfo["normalTexture"].toString();
-            cdata.shininess = matinfo["shininess"].toDouble(1.f);
-            col.setNamedColor(matinfo["specularColor"].toString());
-            cdata.specularColor = col;
-            cdata.specularTexture = matinfo["specularTexture"].toString();
-
-            mat->setValue("diffuseColor",	cdata.diffuseColor);
-            mat->setValue("specularColor",	cdata.specularColor);
-            mat->setValue("ambientColor",	cdata.ambientColor);
-            mat->setValue("emissionColor",	cdata.emissionColor);
-            mat->setValue("shininess",		cdata.shininess);
-            mat->setValue("useAlpha",		true);
-
-            auto libraryTextureIsValid = [](const QString &path, const QString texturePath) {
-                return (
-                    QFile(QDir(QFileInfo(path).absoluteDir()).filePath(texturePath)).exists() &&
-                    QFileInfo(QDir(QFileInfo(path).absoluteDir()).filePath(texturePath)).isFile()
-                    );
-            };
-
-            if (libraryTextureIsValid(filename, cdata.diffuseTexture)) {
-                mat->setValue("diffuseTexture", QDir(QFileInfo(filename).absoluteDir()).filePath(cdata.diffuseTexture));
-            }
-
-            if (libraryTextureIsValid(filename, cdata.specularTexture))
-            {
-                mat->setValue("specularTexture", QDir(QFileInfo(filename).absoluteDir()).filePath(cdata.specularTexture));
-            }
-
-            if (libraryTextureIsValid(filename, cdata.normalTexture)) {
-                mat->setValue("normalTexture", QDir(QFileInfo(filename).absoluteDir()).filePath(cdata.normalTexture));
-                mat->setValue("normalIntensity", 1.f);
-            }
-        }
-
-        iteration++;
-
-        mat->renderStates.rasterState = iris::RasterizerState(iris::CullMode::None, GL_FILL);
-        return mat;
-    }, ssource, this);
-
-    if (firstAdd) {
-        SceneWriter::writeSceneNode(assetMaterial, node, false);
-    }
-
-    // model file may be invalid so null gets returned
-    if (!node) return;
-
-    // rename animation sources to relative paths
-    auto relPath = QDir(Globals::project->folderPath).relativeFilePath(filename);
-    for (auto anim : node->getAnimations()) {
-        if (!!anim->skeletalAnimation)
-            anim->skeletalAnimation->source = relPath;
-    }
-
-    node->setLocalPos(position);
-
-    addNodeToScene(node, QFileInfo(filename).baseName(), false, true);
-}
 
 void AssetViewer::addMesh(const QString &path, bool firstAdd, bool cache, QVector3D position)
 {
@@ -778,12 +639,16 @@ void AssetViewer::addMesh(const QString &path, bool firstAdd, bool cache, QVecto
 		auto mat = reader.createMaterialFromShaderFile(IrisUtils::getAbsoluteAssetPath("app/shader_defs/Default.shader"), db);
 
 		if (firstAdd) {
-			mat->setValue("diffuseColor",	data.diffuseColor);
-			mat->setValue("specularColor",	data.specularColor);
-			mat->setValue("ambientColor",	QColor(130, 130, 130));
-			mat->setValue("emissionColor",	data.emissionColor);
-			mat->setValue("shininess",		data.shininess);
-			mat->setValue("useAlpha",		true);
+            if (data.hasEmbeddedDiffTexture && !data.diffuseTexture.isEmpty()) {
+                data.diffuseColor = QColor(255, 255, 255);
+            }
+
+            mat->setValue("diffuseColor",	data.diffuseColor);
+            mat->setValue("specularColor",	data.specularColor);
+            mat->setValue("ambientColor",	QColor(130, 130, 130));
+            mat->setValue("emissionColor",	data.emissionColor);
+            mat->setValue("shininess",		data.shininess);
+            mat->setValue("useAlpha",		true);
 
 			if (QFile(data.diffuseTexture).exists() && QFileInfo(data.diffuseTexture).isFile())
 				mat->setValue("diffuseTexture", data.diffuseTexture);
