@@ -24,6 +24,8 @@ class QLineEdit;
 class QComboBox;
 class QTreeWidgetItem;
 class QFocusEvent;
+class ProgressDialog;
+
 #include <QTreeWidget>
 #include <QPushButton>
 #include <QJsonObject>
@@ -115,8 +117,6 @@ signals:
     void refreshCollections();
 
 private:
-    bool copyDirectoryRecursively(const QString &sourcePath,
-                                  const QString &destinationPath);
     void extractTexturesAndMaterialFromMaterial(
         const QString &filePath,
         QStringList &textureList,
@@ -141,7 +141,8 @@ private:
 	QVector<QByteArray> iconList;
 	QString filename;
 
-	PreferencesDialog* prefsDialog;
+    PreferencesDialog* prefsDialog;
+    ProgressDialog* progressDialog;
 
 	QPushButton *updateAsset;
 	QPushButton *addToProject;

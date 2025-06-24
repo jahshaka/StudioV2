@@ -310,36 +310,23 @@ void AssetViewer::loadJafSky(QString guid, bool firstAdd, bool cache, bool first
 }
 
 void AssetViewer::loadModel(QString str, QString guid, bool firstAdd, bool cache, bool firstLoad) {
-    pdialog->setLabelText(tr("Loading asset preview..."));
-    pdialog->show();
-    QApplication::processEvents();
-	makeCurrent();
-    addMesh(str, firstAdd, cache);
-	if (firstLoad) {
-		resetViewerCamera();
-	}
-	else {
-		resetViewerCameraAfter();
-	}
-	renderObject();
-	doneCurrent();
-    pdialog->close();
-}
+    loadJafModel(str, guid, firstAdd, cache, firstLoad);
+    return;
 
-void AssetViewer::loadObjModel(QString str, QString guid, bool firstAdd, bool cache, bool firstLoad)
-{
+
     pdialog->setLabelText(tr("Loading asset preview..."));
     pdialog->show();
     QApplication::processEvents();
     makeCurrent();
-
-    //addObjMesh(str, guid, firstAdd, cache);
-    if (firstLoad) resetViewerCamera();
-    else resetViewerCameraAfter();
-
+    addMesh(str, firstAdd, cache);
+    if (firstLoad) {
+        resetViewerCamera();
+    }
+    else {
+        resetViewerCameraAfter();
+    }
     renderObject();
     doneCurrent();
-
     pdialog->close();
 }
 
